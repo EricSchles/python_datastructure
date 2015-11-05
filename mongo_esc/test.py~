@@ -1,0 +1,14 @@
+import requests
+from client import DB
+print "import worked"
+db = DB()
+print "init worked"
+db.connect()
+print "connect worked"
+db.change_db("thing")
+print "change db worked"
+db.save_data("thing",{"hello":"there"})
+print "saving data worked"
+parameters={"keys":None,"values":None,"document":{"hello":"there"}}
+print db.get_data("thing",parameters=parameters).text
+print "getting data worked"
