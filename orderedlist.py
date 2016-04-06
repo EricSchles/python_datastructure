@@ -3,15 +3,13 @@ class Set:
         self.internal_list = list()
 
     def append(self,data):
-        if not data in self.internal_list:
-            self.internal_list.append(data)
-            self.internal_list.sort()
+        self.internal_list.append(data)
+        self.internal_list.sort()
 
     def remove(self,data):
         self.internal_list.remove(data)
         self.internal_list.sort()
 
-        
 class Node:
     def __init__(self,data,next=None,prev=None):
         self.data = data
@@ -69,17 +67,8 @@ class LinkedList:
         new_node.next = cur
         cur.prev = new_node
         new_node.prev = prev_node
-
-    def _contains(self,data):
-        cur = self.head
-        while cur:
-            if cur == data:
-                return True
-            cur = cur.next 
-        return False
-    
+        
     def append(self,data):
-        if self._contains(data): return 
         cur = self.head
         if not cur.next:
             new_node = Node(data)

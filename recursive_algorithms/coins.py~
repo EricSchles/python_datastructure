@@ -1,0 +1,5 @@
+import random
+
+configuration_of_coins = []
+while len(configuration_of_coins) < 5:
+    potential_coin_value = random.randint(0,100)
