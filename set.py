@@ -92,7 +92,27 @@ class LinkedList:
                     new_node = Node(data)
                     cur.next = new_node
                     new_node.prev = cur
+    def remove(self,data):
+        cur = self.head
+        while cur != data:
+            if not cur: break
+            cur = cur.next
             
+        if cur:
+            if cur.next:
+                prev_node = cur.prev
+                new_node = cur.next
+                prev_node.next = new_node
+                new_node.prev = prev_node
+                cur.next = None
+                cur.prev = None
+                cur = None
+            else:
+                prev_node = cur.prev
+                prev_node.next = None
+                cur.prev = None
+                cur = None
+                
     def pprint(self):
         cur = self.head
         while cur:
