@@ -1,0 +1,99 @@
+class Set:
+    def __init__(self):
+        self.internal_list = list()
+
+    def append(self,data):
+        self.internal_list.append(data)
+        self.internal_list.sort()
+
+    def remove(self,data):
+        self.internal_list.remove(data)
+        self.internal_list.sort()
+
+class Node:
+    def __init__(self,data,next=None,prev=None):
+        self.data = data
+        self.next = next
+        self.prev = prev
+    def __str__(self):
+        return repr(self.data)
+    def __lt__(self,other):
+        return self.data < other
+    def __gt__(self,other):
+        return self.data > other
+    def __eq__(self,other):
+        return self.data == other
+    def __ne__(self,other):
+        return self.data != other
+    def __le__(self,other):
+        return self.data <= other
+    def __ge__(self,other):
+        return self.data >= other
+
+# currently failing:
+# >>> ll = LinkedList()
+# >>> ll.append(5)
+# >>> ll.append(4)
+# >>> ll.append(7)
+# >>> ll.pprint()
+# 'head'
+# 4
+# 5
+# 7
+# >>> ll.append(2)
+# >>> ll.pprint()
+# 'head'
+# 2
+# 4
+# 5
+# 7
+# >>> ll.append(3)
+# >>> ll.pprint()
+# 'head'
+# 3
+# 4
+# 3
+# >>> 
+
+class LinkedList:
+    def __init__(self):
+        self.head = Node("head")
+        self.size = 0
+
+    def _add_node(self,cur,data):
+        new_node = Node(data)
+        prev_node = cur.prev
+        prev_node.next = new_node
+        new_node.next = cur
+        new_node.prev = prev_node
+        
+    def append(self,data):
+        cur = self.head
+        if not cur.next:
+            new_node = Node(data)
+            cur.next = new_node
+            new_node.prev = self.head
+        else:
+            cur = cur.next
+            if data < cur:
+                self._add_node(cur,data)
+            else:
+                while cur.next:     
+                    if data < cur:
+                        self._add_node(cur,data)
+                        break
+                    cur = cur.next
+                new_node = Node(data)
+                cur.next = new_node
+                new_node.prev = cur
+            
+    def pprint(self):
+        cur = self.head
+        while cur:
+            print cur
+            cur = cur.next
+            
+    
+class OrderedList:
+    def __init__(self):
+        pass

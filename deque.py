@@ -104,6 +104,19 @@ class LinkedList:
             cur = self.head
             cur.next = None
             self.size -= 1
+            
 class DequeLinkedList:
     def __init__(self):
         self.items = LinkedList()
+    def removeBack(self):
+        self.items.removeBack()
+    def append(self,data):
+        self.items.append(data)
+    def removeFront(self):
+        self.items.removeFront()
+    def is_empty(self):
+        return self.items.is_empty()
+    def prepend(self,data):
+        self.items.prepend(data)
+    def pprint(self):
+        self.items.pprint()
