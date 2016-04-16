@@ -1,0 +1,6 @@
+position = 0
+found = False
+while position < len(listing) and not found:
+    if list[position] == item:
+        found = True
+    position += 1
