@@ -1,0 +1,11 @@
+class Node:
+    def __init__(self,data,right=None,left=None):
+        self.data = data
+        self.left = left
+        self.right = right
+    def __str__(self):
+        return repr(self.data)
+
+    
+class BinarySearchTree():
+    

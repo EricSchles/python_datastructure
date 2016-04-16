@@ -378,5 +378,48 @@ Okay - so what is this topic really?  This is what is known as code refactoring 
 
 So enough chat about "best practices".  Let's move onto something a little tougher!
 
+##Bringing in Data Structures
+
+So now we've seen some ways of accessing data from a python built-in data structure.  But what if you wanted to build that data structure yourself?  Well that's what we are going to be talking about in this section.  This will more or less be the data structure analog to the last section - we'll be covering linearly stored data and non-linearly or binarily stored data.
+
+So let's get started!
+
+###Enter the linked list
+
+The linked list is probably the similest data structure you could think of.  There are a few ways implement it - wrap the builtin python list and just support a few operators.  This is a form of information hiding - only exposing the methods you want your user to have access to.  It's an important design principle and manifests in a few places - java code in large enterprise settings and in rest based api's with connections over a network.  Most coders not living in enterprise land will encounter rest based api's so that's the view we'll take.
+
+So let's see how to wrap methods.  And then we'll interact over an api with our list.
+
+```
+class List:
+    def __init__(self):
+        self.listing = []
+    def append(self,data):
+        self.listing.append(data)
+    def remove(self,data):
+        self.listing.remove(data)
+    def get_element(self,index):
+        return self.listing[index]
+    def get_size(self):
+        return len(self.listing)
+    def pprint(self):
+        print(self.listing)
+
+if __name__ == '__main__':
+    import random
+    listing = List()
+    [listing.append(random.randint(0,1000)) for _ in xrange(100)]
+    first_elem = listing.get_element(0)
+    listing.pprint()
+    listing.remove(first_elem)
+    listing.pprint()
+```
+
+As we can see, we wrap some of the methods of the builtin list and produce an "API" aka application programming interface into the builtin structure.  Why the heck might you want to do this in actual code?  Well, if you are working in Java land, this makes a lot of sense.  You might write a ton of internal methods that your client is never supposed to use because they mess up things if not called appropriately.  So by writing an "interface" class, the user will never access those methods.  Of course, hopefully we are adult enough at this point that if someone says don't do something in clearly written code, they just don't do it.  
+
+Let's move onto an example that actually feels more relevant in 2016 - writing an api for a rest client.
+
+
+
 Up until now we've dealt with one data structure - the list.  Now we are going to deal with an entirely different data structure - a tree.  It's worth noting that we've been implicitly dealing with tree data structures ever since we introduced recursion - because our function calls are carried out in a tree structure.  But now, we'll explicitly write down a tree data structure to deal with.
 

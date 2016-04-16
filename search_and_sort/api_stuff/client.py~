@@ -1,0 +1,10 @@
+import requests
+import json
+import random
+
+print requests.post("http://localhost:5000/add", data = json.dumps({"data":5}))
+print requests.get("http://localhost:5000/size")
+print requests.post("http://localhost:5000/get_element", data = json.dumps({"data":0}))
+print requests.post("http://localhost:5000/pretty_print")
+print requests.post("http://localhost:5000/remove", data = json.dumps({"data":5}))
+

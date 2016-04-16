@@ -1,0 +1,34 @@
+from app import app
+from flask import render_template,request
+from app.models import Data
+from app import db
+
+@app.route("/add",methods=["GET","POST"])
+def add():
+
+    dicter = request.values.to_dict()
+    import code
+    code.interact(local=globals())
+    data = Data(dicter["data"])
+    db.session.add(data)
+    db.session.commit()
+    return "successfully added",dicter["data"]
+
+@app.route("/remove",methods=["GET","POST"])
+def remove():
+    dicter = request.values.to_dict()
+    Data.query.filter_by(data=dicter["data"]).delete()
+    return "successfully deleted",dicter["data"]
+
+@app.route("/size",methods=["GET","POST"])
+def size():
+    return str(Data.query.count())
+
+@app.route("/get_element",methods=["GET","POST"])
+def get_element():
+    dicter = request.values.to_dict()
+    return str([d.data for d in Data.query.filter_by(id=dicter["data"]).all()])
+
+@app.route("/pretty_print",methods=["GET","POST"])
+def pretty_print():
+    return str([d.data for d in Data.query.all()])

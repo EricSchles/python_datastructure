@@ -1,0 +1,8 @@
+class List:
+    def __init__(self):
+        self.listing = []
+    def append(self,data):
+        self.listing.append(data)
+    def remove(self,data):
+        self.listing.remove(data)
+    
