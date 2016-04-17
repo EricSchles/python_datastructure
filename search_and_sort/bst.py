@@ -32,10 +32,13 @@ class BinarySearchTree:
             if not cur.left:
                 new_node = Node(data)
                 cur.left = new_node
-                new_node.parent = new_node
+                new_node.parent = cur
             else: self._insert(data,cur.left)
         else:
-            if not cur.right: cur.right = Node(data)
+            if not cur.right:
+                new_node = Node(data)
+                cur.right = new_node
+                new_node.parent = cur
             else: self._insert(data,cur.right)
             
     def pprint(self):
@@ -71,7 +74,7 @@ class BinarySearchTree:
             else: return False
             
     def delete(self,data):
-        cur,parent = self.get(data)
+        cur = self.get(data)
         if cur:
             
         
