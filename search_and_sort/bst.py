@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self,data,left=None,right=None):
+    def __init__(self,data,left=None,right=None,parent=None):
         self.left = left
         self.right = right
         self.data = data
@@ -24,10 +24,8 @@ class BinarySearchTree:
         self.size = 0
         
     def insert(self,data):
-        if not self.root:
-            self.root = Node(data)
-        else:
-            self._insert(data,self.root)     
+        if not self.root:self.root = Node(data)
+        else:self._insert(data,self.root)     
     def _insert(self,data,cur):
         if data < cur:
             if not cur.left: cur.left = Node(data)
@@ -71,8 +69,9 @@ class BinarySearchTree:
             else: return False
             
     def delete(self,data):
-        cur = self.root
-        
+        cur = self.get(data)
+        if cur:
+            
         
 if __name__ == '__main__':
     bst = BinarySearchTree()
