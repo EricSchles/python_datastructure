@@ -58,7 +58,9 @@ class BinarySearchTree:
             else: return False
 
     def delete(self,data):
-            
+        cur = self.root
+        
+        
 if __name__ == '__main__':
     bst = BinarySearchTree()
     bst.insert(5)
