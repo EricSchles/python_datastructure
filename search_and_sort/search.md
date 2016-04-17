@@ -419,6 +419,294 @@ As we can see, we wrap some of the methods of the builtin list and produce an "A
 
 Let's move onto an example that actually feels more relevant in 2016 - writing an api for a rest client.
 
+So rather than going through an entire discussion of the code, I'm only going to [reference it here](https://github.com/EricSchles/python_datastructure/tree/master/search_and_sort/api_stuff) and leave it to you to look at the boiler plate parts (__init__.py, init_db.py).
+
+The files we care about are:
+
+models.py, views.py, client.py
+
+`models.py` sets up our abstraction around our data - which in this case is a linkedlist, modeled in our models.py (which informs the structure of our database).  Note that you can use references (which I'll explain in more detailed below) to model any data structure you might like in the database, at a high level of abstraction.  Databases themselves have their own internal data structures.  This vary in sophistication, one standard academic data structure used in databases is the b-tree, which we will also look at later.  For now, we take these abstractions as given and there exists some way to store data in our database and retrieve it.  And we can model any datastructure we like using our database.  (a question you may then ask yourself is, why study data structures at all? And instead just focus on the underlying algorithms, since that seems like the right way to think about things).  Don't worry I think this way too, but I digress.
+
+Let's look at models.py to get a sense of how datastructure modeling occurs in the database:
+
+```
+from app import db
+
+class Data(db.Model):
+    __tablename__ = "data"
+    id = db.Column(db.Integer,primary_key=True)
+    data = db.Column(db.Integer)
+
+    def __init__(self,data):
+        self.data = data
+
+    def __str__(self):
+        return repr(self.data)
+```
+
+Pretty nice right?!  We have a performant version of our builtin python list, basically for free.  The trick is we need to either carry out computations on the database which limits our ability to debug.  Or we need to process our data in batches (called batch processing), reading little bits of our massive database into memory at time, so that we can store lots and lots of data.  
+
+Let's break this down a little bit -
+
+We can think of data in our database as more or less what data looks like in excel - there are rows and columns.  We have a single table in our database, where each row of our data has an id column and a data column.  The data column is the data in the database.  The id column is the "index" in our database.  This more or less gives us a list!  That's it :)
+
+Now let's look at the client we are going to make to interact with our wrapper class!
+
+`client.py`
+
+```
+import requests
+import json
+import random
+
+print requests.post("http://localhost:5000/add", data = json.dumps({"data":"5"})).text
+print requests.get("http://localhost:5000/size").text
+print requests.post("http://localhost:5000/get_element", data = json.dumps({"data":"0"})).text
+print requests.post("http://localhost:5000/pretty_print").text
+print requests.post("http://localhost:5000/remove", data = json.dumps({"data":"5"})).text
+```
+
+So!  As you can see we can `add` data via the add route, we can check the size of our database - how much data is in it.  We can get individual elements, by index.  And we can remove data from our database.  Pretty awesome right!!!
+
+This may not seem that impressive, until you realize this is happening over the network - therefore it's all happening between two different machines.  This is of course a simple example, but this framework extends to any type of distributed computation we may want to do.  And it's a precursor to thinking about cluster environments.
+
+The last thing we need to look at is how we directly interact with our database.  This is all done in the controller - `views.py`:
+
+```
+from app import app
+from flask import render_template,request
+from app.models import Data
+from app import db
+import json
+
+@app.route("/add",methods=["GET","POST"])
+def add():
+    dicter = json.loads(request.data)
+    data = Data(int(dicter["data"]))
+    db.session.add(data)
+    db.session.commit()
+    return "successfully added "+str(dicter["data"])
+    
+    
+@app.route("/remove",methods=["GET","POST"])
+def remove():
+    dicter = json.loads(request.data)
+    Data.query.filter_by(data=int(dicter["data"])).delete()
+    return "successfully deleted "+str(dicter["data"])
+
+@app.route("/size",methods=["GET","POST"])
+def size():
+    return str(Data.query.count())
+
+@app.route("/get_element",methods=["GET","POST"])
+def get_element():
+    dicter = json.loads(request.data)
+    return str([d.data for d in Data.query.filter_by(id=int(dicter["data"])).all()])
+
+@app.route("/pretty_print",methods=["GET","POST"])
+def pretty_print():
+    return str([d.data for d in Data.query.all()])
+```
+
+I'm not going to dig too deep into the details here.  But I'll say you should check out the flask documentation, and flask-sqlalchemy to fully understand this code.
+
+We've talked alittle bit about references, but we haven't formmally defined them yet.  
+
+A reference is a typically used in the context of data.  We've actually been making use of references ever since we started programming:
+
+say we have the value 5 and we want to capture this in to variables, x and y, like so:
+
+```
+x = 5
+y = 5
+```
+
+In Python (and other dynamically typed scripting languages) everything is technically an object, so any assignment statement to a variable will be a reference to that object.  Here we reference x and y to the object 5.  
+
+In this case, both x and y will allow you to access and make use of the "5 object" however you might normally use it. 
+
+We can add x and y - `x + 5`, `x + y`, `5 + y`.
+
+We can even reassign x or y or both to whatever we'd like:
+
+```
+y = 7
+x = 4
+```
+
+We can even change the types, because python is a dynamic language and references are to objects, not specific types.
+
+```
+x = "hello"
+y = "there"
+```
+
+It's a pretty big deal, and it's awesome.  So though we don't explicitly think of the assignment operator as creating a reference, it is!  And it allows us to do some pretty powerful high level things, in terms of expressability.  Creating the right references is hugely important and non-trivial (just try programming c++).  By not having to work directly with those, we can focus on the pieces that matter - making our algorithms correct.  
+
+So now that you hopefully understand the idea of creating a reference (via assignment), let's so how it get's used to build data structures!
+
+```
+class Node:
+    def __init__(self,data,next=None,prev=None):
+        self.data = data
+        self.prev = prev
+        self.next = next
+    #comparator methods
+    def __lt__(self,other):
+        return self.data < other
+    def __gt__(self,other):
+        return self.data > other
+    def __eq__(self,other):
+        return self.data == other
+    def __ge__(self,other):
+        return self.data >= other
+    def __le__(self,other):
+        return self.data <= other
+    def __ne__(self,other):
+        return self.data != other
+    def __str__(self):
+        return repr(self.data)
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+        self.size = 0
+        
+    def append(self,data):
+        if not self.head:
+            self.head = Node(data)
+        else:
+            cur = self.head
+            while cur.next:
+                cur = cur.next
+            new_node = Node(data)
+            cur.next = new_node
+            new_node.prev = cur
+        self.size += 1
+        
+    def get_element(self,index):
+        if not index <= self.size: raise Exception("Index out of range")
+        cur = self.head
+        counter = 0
+        while index != counter and index <= self.size:
+            cur = cur.next
+            counter += 1
+        return cur.data
+            
+    def get_index(self,data):
+        index = 0
+        cur = self.head
+        while cur:
+            if cur == data:
+                return index
+            else:
+                cur = cur.next
+                index += 1
+        return -1
+            
+    def remove(self,data):
+        if not self.head: return
+        if self.head == data:
+            cur = self.head
+            self.head = cur.next
+            cur.next = None
+            cur = None
+            return
+        cur = self.head
+        while cur.next:
+            if cur == data:
+                prev_node = cur.prev
+                new_next = cur.next
+                prev_node.next = new_next
+                new_next.prev = prev_node
+                cur = None
+                break
+            cur = cur.next
+        if cur == data:
+            prev_node = cur.prev
+            prev_node.next = None
+            cur = None
+            
+    def pprint(self):
+        if not self.head: print
+        cur = self.head
+        while cur:
+            print cur,
+            cur = cur.next
+        print 
+            
+if __name__ == '__main__':
+    import random
+    ll = LinkedList()
+    [ll.append(random.randint(0,1000)) for _ in xrange(10)]
+    ll.pprint()
+    element = ll.get_element(0)
+    ll.remove(element)
+    ll.pprint()
+```
+
+Let's start by looking at the node class:
+
+```
+class Node:
+    def __init__(self,data,next=None,prev=None):
+        self.data = data
+        self.prev = prev
+        self.next = next
+    #comparator methods
+    def __lt__(self,other):
+        return self.data < other
+    def __gt__(self,other):
+        return self.data > other
+    def __eq__(self,other):
+        return self.data == other
+    def __ge__(self,other):
+        return self.data >= other
+    def __le__(self,other):
+        return self.data <= other
+    def __ne__(self,other):
+        return self.data != other
+    def __str__(self):
+        return repr(self.data)
+```
+
+All data structures are defined as a set of containers of data.  The way in which the containers or nodes are composed together determine the structure for the data, aka the data's structure.  The simplest possible structure for data is linear - a node connected only to one other node.  In this case we show a node that can connect both forward and backward - thus we have a linkedlist, where we can access elements before and after it only.  
+
+The next and prev elements store references to the next node in the sequence and the previous node in the sequence.  That's all you can access in this way.  In this data structure - data is stored dynamically, at run time.  So there is no other way to know where in memory it will be, other than via referencing it.  
+
+So how does referencing elements work?
+
+Let's define a simpler node interface, for the purposes of understanding this:
+
+```
+class Node:
+    def __init__(self,data,next=None):
+        self.data = data
+        self.next = next
+    def __str__(self):
+        return repr(self.data)
+
+if __name__ == '__main__':
+    head = Node(0)
+    new_node = Node(1)
+    head.next = new_node
+    new_node = Node(2)
+    head.next.next = new_node
+    new_node = Node(3)
+    head.next.next.next = new_node
+    #Hopefully it's clear what I'm doing here - creating new nodes and then adding them to the linkedlist, not by name, but indirectly via node.next references.  Why do I need so many by new_node = Node(3)?  Because I've used up the previous references storing the previous nodes.
+    #Now that I've done that, I'm ready to reference nodes via indirection!
+    cur = head
+    while cur:
+        print cur
+        cur = cur.next
+```
+This next way of making use of indirection is crucial to understanding referencing!  I set the cur - the current node, equal to the next object via `cur = cur.next`.  What this is saying is, I want to move forward to the next reference in the list of linked objects.  What else, might be weird is `while cur:`.  Since None is equal to False in Python and while loops end when they evaluate to False, we can make use of this.  In our `class Node` definition, we by default set the value of next to None, via `def __init__(self,data,next=None):`.  What this means is unless we explicitly set node.next to something else, it will be None.  So when we've reached the last node in our linked list of data, after that we automatically set cur = None (since eventually cur.next will be None).  And thus `cur` in `while cur:` evaluates to False eventually, ending the loop.  This coding pattern is very very hard to understand.  What you should do to convince yourself of how this works - 
+
+try creating a bunch of nodes and try linking them.  Trying iterating through the linked elements and even try doing something more complex.  References can be one of the hardest conceptual barriers in computer science.  But once you can understand them, you can write any structure to your data you might like.  
+
+And for those of you who are more mathematically minded, referencing is a precursor to understanding discrete sets, discrete structures and discrete topologies.  Using referencing you can create your own discrete topologies and thus model many types of mathematical systems!  You are guaranteed that your topologie will have a distance metric in fact!  Where distance will be defined by the number of vertices between A and B (for two nodes in the graph).  If none of that made sense, don't worry!  There are lots of good reasons to understand this for the less mathematically minded among us!
+
 
 
 Up until now we've dealt with one data structure - the list.  Now we are going to deal with an entirely different data structure - a tree.  It's worth noting that we've been implicitly dealing with tree data structures ever since we introduced recursion - because our function calls are carried out in a tree structure.  But now, we'll explicitly write down a tree data structure to deal with.
