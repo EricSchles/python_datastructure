@@ -56,6 +56,8 @@ class BinarySearchTree:
         else:
             if cur.right: return self._exists(data,cur.right)
             else: return False
+
+    def delete(self,data):
             
 if __name__ == '__main__':
     bst = BinarySearchTree()
