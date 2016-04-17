@@ -48,6 +48,7 @@ class BinarySearchTree:
         cur = self.root
         return self._exists(data,cur)
     def _exists(self,data,cur):
+        print cur
         if data == cur: return True
         if data < cur: self._exists(data,cur.left)
         else: self._exists(data,cur.right)
@@ -60,5 +61,5 @@ if __name__ == '__main__':
     bst.insert(3)
     bst.insert(1)
     bst.insert(9)
-    print bst.exists(7)
+    bst.exists(7)
     #bst.pprint()
