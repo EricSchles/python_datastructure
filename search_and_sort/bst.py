@@ -40,10 +40,18 @@ class BinarySearchTree:
         if not self.root: return
         self._pprint(self.root,0)
     def _pprint(self,cur,level):
-        print level*"*"+str(cur),
+        print level*"*"+str(cur)
         if cur.left:self._pprint(cur.left,level+1)
         if cur.right:self._pprint(cur.right,level+1)
 
+    def exists(self,data):
+        cur = self.root
+    def _exists(self,data,cur):
+        if data == cur: return True
+        if data < cur: return self._exists(data,cur.left)
+        else: return self._exists(data,cur.right)
+        
+        
 if __name__ == '__main__':
     bst = BinarySearchTree()
     bst.insert(5)
