@@ -707,7 +707,205 @@ try creating a bunch of nodes and try linking them.  Trying iterating through th
 
 And for those of you who are more mathematically minded, referencing is a precursor to understanding discrete sets, discrete structures and discrete topologies.  Using referencing you can create your own discrete topologies and thus model many types of mathematical systems!  You are guaranteed that your topologie will have a distance metric in fact!  Where distance will be defined by the number of vertices between A and B (for two nodes in the graph).  If none of that made sense, don't worry!  There are lots of good reasons to understand this for the less mathematically minded among us!
 
+Now let's look at the linked list:
 
+```
+class LinkedList:
+    def __init__(self):
+        self.head = None
+        self.size = 0
+        
+    def append(self,data):
+        if not self.head:
+            self.head = Node(data)
+        else:
+            cur = self.head
+            while cur.next:
+                cur = cur.next
+            new_node = Node(data)
+            cur.next = new_node
+            new_node.prev = cur
+        self.size += 1
+        
+    def get_element(self,index):
+        if not index <= self.size: raise Exception("Index out of range")
+        cur = self.head
+        counter = 0
+        while index != counter and index <= self.size:
+            cur = cur.next
+            counter += 1
+        return cur.data
+            
+    def get_index(self,data):
+        index = 0
+        cur = self.head
+        while cur:
+            if cur == data:
+                return index
+            else:
+                cur = cur.next
+                index += 1
+        return -1
+            
+    def remove(self,data):
+        if not self.head: return
+        if self.head == data:
+            cur = self.head
+            self.head = cur.next
+            cur.next = None
+            cur = None
+            return
+        cur = self.head
+        while cur.next:
+            if cur == data:
+                prev_node = cur.prev
+                new_next = cur.next
+                prev_node.next = new_next
+                new_next.prev = prev_node
+                cur = None
+                break
+            cur = cur.next
+        if cur == data:
+            prev_node = cur.prev
+            prev_node.next = None
+            cur = None
+            
+    def pprint(self):
+        if not self.head: print
+        cur = self.head
+        while cur:
+            print cur,
+            cur = cur.next
+        print 
+            
+if __name__ == '__main__':
+    import random
+    ll = LinkedList()
+    [ll.append(random.randint(0,1000)) for _ in xrange(10)]
+    ll.pprint()
+    element = ll.get_element(0)
+    ll.remove(element)
+    ll.pprint()
+```
+
+And let's first restrict ourselves to looking at just the append method and the __init__ method:
+
+```
+class LinkedList:
+    def __init__(self):
+        self.head = None
+        self.size = 0
+        
+    def append(self,data):
+        if not self.head:
+            self.head = Node(data)
+        else:
+            cur = self.head
+            while cur.next:
+                cur = cur.next
+            new_node = Node(data)
+            cur.next = new_node
+            new_node.prev = cur
+        self.size += 1
+```
+
+This is technically all we need to create a linked list.  Everything else is more or less just me showing you what you can do, and showing off a little `:P`.
+
+The __init__ method is very simple - we set the head of our linked list to be None at the start.  This is a choice and convention goes either way - so do what you think is easiest.  Some people like to put in a marker value called `"head"` into `self.head`.  It's honestly up to you.
+
+I prefer to be a minimalist with my space.  And so I see such a value as excessive.  But again that is totally a taste thing.  
+
+Let's move onto the append method - the heart of our linked list.  How you add data to a data structure determines it's data structure.  So whether it be an add, append, update, adjust, or however data is added to your data structure, that is where you should always look first to understand what your data structure is doing.  
+
+As you can see from the append method, we take in data.  And then encapsulate it in a node.  In the simplest case - we simply set `self.head = Node(data)`.  Otherwise, we follow standard convention - setting up a reference node which will use to access different elements of the linkedlist.  While these elements are stored in `cur` we are free to manipulate them as we desire.  Since we are appending, elements should be added to the end of the linked list, which is why the statement:
+
+```
+while cur.next:
+    cur = cur.next
+```
+
+is there.  This statement more or less says, while we are not at the last node in our linked list (because at the last node the next node after that will be None which is the same as False in a while loop), we update `cur` with the next node, `cur.next`.  If you are used to simply going to whatever element you want in an array, sorry!  That's not how this data structure works.  The reason arrays allow you to simply choose where in the list you want to go, is because they take advantage of certain properities of memory layout.  Specifically, they are stored in contigious blocks of memory - one piece of memory after another.  Since memory addresses are just numbers that are sequentially numbered, you can use simple addition (which is always a constant time operator) to get to the elements you care about.  So how might this look in an array versus a linked list?
+
+say you have an array with for integers -
+
+```
+value address
+1     1000
+2     1004
+3     1008
+4     1012
+```
+
+Notice something about the addresses?  They are 4 address numbers away from each other!  Always!  This is because integers take up a fixed 4 bits.  So if we want the fourth element in our list, we simply need the address of the first element - `1000` and then we add `1000 + (3 places forward in memory ) * (4 bits each)` aka `1000 + 3*4`, which is `1012`.  And what do you know?!  That's exactly the address of the value 4.  
+
+Unfortunately, linked lists are laid out with no such memory guarantee.  That's because they are dynamically assigned memory addresses from the program's memory heap, not the program's memory stack.  You don't need to understand the difference between these two in detail right now, except that heap addresses are random.  Where as stack addresses are sequential.  What's the advantage of pulling from one over the other?  Addresses in the heap may not be sequential but they are dynamic!  With arrays we need to know the size of the array ahead of time, which sucks!  With linked lists we can add new data or remove it as we please.  
+
+So why are python builtin lists able to grow "dynamically"? Aren't they arrays?  Well they are, but they are objects, like everything else in Python.  So they aren't 'real' arrays.  But you don't have to worry about that!  If you were dealing with real arrays, you could just start with an array of a fixed size and then copy everything over to a larger array (say that's twice as big) everytime you run out of space.  This trick means that the size complexity is [memoized](https://en.wikipedia.org/wiki/Memoization).  I think it's out of scope to explain memoization but I'll link to the wikipedia article!  
+
+SO! It's time for the secret sauce, assignment when we get to the right element:
+
+```
+new_node = Node(data) #this is creating the new node
+cur.next = new_node #this is creating the reference and adding it to the linked lists
+new_node.prev = cur #this is referencing back to the current element
+```
+
+Referencing back is going to make our lives a lot easier for removal of elements.  
+
+Now let's look at remove
+```
+def remove(self,data):
+    if not self.head: return
+    if self.head == data:
+        cur = self.head
+        self.head = cur.next
+        cur.next = None
+        cur = None
+        return
+    cur = self.head
+    while cur.next:
+        if cur == data:
+            prev_node = cur.prev
+            new_next = cur.next
+            prev_node.next = new_next
+            new_next.prev = prev_node
+            cur = None
+            break
+        cur = cur.next
+    if cur == data:
+        prev_node = cur.prev
+        prev_node.next = None
+        cur = None
+```
+
+`if self.head == data` - this statement means that the first element is the one we need to remove.  
+`cur = self.head` - here we set up a reference to the node to be deleted.  
+`self.head = cur.next` - here we set the new first node in the list equal to the second element of the list.
+`cur.next = None` - here we delete the reference to the old second node.
+`cur = None` - here we delete the current node, which is the old head node.
+
+This handles the case when the head node is the one to be deleted.  In all other cases we need to iterate through the list, using linear search to find the correct element, assuming it exists in the list.  
+
+```
+cur = self.head
+while cur.next:
+    if cur == data:
+        prev_node = cur.prev
+        new_next = cur.next
+        prev_node.next = new_next
+        new_next.prev = prev_node
+        cur = None
+        break
+    cur = cur.next  
+```
+
+specifically we use - `if cur == data:` to find the element.  
+
+All the other logic is the same as before, except we make use of the previous element.  I'm going to leave it as an exercise to understand how we use new_next.prev, cur.prev, and prev_node `:)`.  
+
+#Trees
 
 Up until now we've dealt with one data structure - the list.  Now we are going to deal with an entirely different data structure - a tree.  It's worth noting that we've been implicitly dealing with tree data structures ever since we introduced recursion - because our function calls are carried out in a tree structure.  But now, we'll explicitly write down a tree data structure to deal with.
+
+It's also worth noting that linear search and linked lists are analogs in the same way binary search and binary trees are analogs.  
 

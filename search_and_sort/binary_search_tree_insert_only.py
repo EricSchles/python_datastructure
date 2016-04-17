@@ -55,20 +55,6 @@ class BinarySearchTree():
                 new_node = Node(data)
                 cur.right = new_node
                 self.size += 1
-
-    def remove(self,data):
-        cur = self.head
-        self._remove(data,cur)
-    def _remove(self,data,cur):
-        if data == cur:
-            if cur.left and not cur.left.right:
-                cur = cur.left
-            elif cur.right and not cur.right.left:
-                cur = cur.right
-            
-        else:
-            self._remove(data,cur.left)
-            self._remove(data,cur.right)
                 
     def pprint(self,elem):
         if elem.left: self.pprint(elem.left)
