@@ -265,7 +265,7 @@ n = 1,000,000
 linear search result: 572418 and it took: 0.109135866165
 binary search result: 572419 and it took: 0.36368894577
 And the value actually exists
-``
+```
 
 ```
 n = 10,000,000
