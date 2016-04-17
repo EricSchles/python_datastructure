@@ -57,6 +57,19 @@ class BinarySearchTree:
             if cur.right: return self._exists(data,cur.right)
             else: return False
 
+    def get(self,data):
+        cur = self.root
+        return self._exists(data,cur)
+    def _get(self,data,cur):
+        if data == cur:
+            return cur
+        elif data < cur:
+            if cur.left: return self._get(data,cur.left)
+            else: return False
+        else:
+            if cur.right: return self._get(data,cur.right)
+            else: return False
+            
     def delete(self,data):
         cur = self.root
         
