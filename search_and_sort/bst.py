@@ -3,6 +3,7 @@ class Node:
         self.left = left
         self.right = right
         self.data = data
+        self.parent = parent
     def __lt__(self,other):
         return self.data < other
     def __gt__(self,other):
@@ -28,7 +29,10 @@ class BinarySearchTree:
         else:self._insert(data,self.root)     
     def _insert(self,data,cur):
         if data < cur:
-            if not cur.left: cur.left = Node(data)
+            if not cur.left:
+                new_node = Node(data)
+                cur.left = new_node
+                new_node.parent = new_node
             else: self._insert(data,cur.left)
         else:
             if not cur.right: cur.right = Node(data)
@@ -46,8 +50,7 @@ class BinarySearchTree:
         cur = self.root
         return self._exists(data,cur)
     def _exists(self,data,cur):
-        if data == cur:
-            return True
+        if data == cur:return True
         elif data < cur:
             if cur.left:return self._exists(data,cur.left)
             else: return False
@@ -59,8 +62,7 @@ class BinarySearchTree:
         cur = self.root
         return self._exists(data,cur)
     def _get(self,data,cur):
-        if data == cur:
-            return cur
+        if data == cur: return cur
         elif data < cur:
             if cur.left: return self._get(data,cur.left)
             else: return False
@@ -69,7 +71,7 @@ class BinarySearchTree:
             else: return False
             
     def delete(self,data):
-        cur = self.get(data)
+        cur,parent = self.get(data)
         if cur:
             
         
