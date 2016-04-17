@@ -72,7 +72,12 @@ class BinarySearchTree:
         else:
             if cur.right: return self._get(data,cur.right)
             else: return False
-            
+    def children_count(self,cur):
+        count = 0
+        if cur.left: count += 1
+        if cur.right: count += 1
+        return count
+    
     def delete(self,data):
         cur = self.get(data)
         if cur:
