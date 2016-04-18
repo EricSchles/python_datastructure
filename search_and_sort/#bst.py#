@@ -86,7 +86,7 @@ class BinarySearchTree:
             if parent:
                 if parent.left is cur: parent.left = None
                 else: parent.right = None
-            else: 
+            else: self.data
             
         
 if __name__ == '__main__':
