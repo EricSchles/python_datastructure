@@ -80,6 +80,7 @@ class BinarySearchTree:
     
     def delete(self,data):
         cur = self.get(data)
+        num_children = children_count(cur)
         if cur:
             
         
