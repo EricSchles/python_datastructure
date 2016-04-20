@@ -907,5 +907,375 @@ All the other logic is the same as before, except we make use of the previous el
 
 Up until now we've dealt with one data structure - the list.  Now we are going to deal with an entirely different data structure - a tree.  It's worth noting that we've been implicitly dealing with tree data structures ever since we introduced recursion - because our function calls are carried out in a tree structure.  But now, we'll explicitly write down a tree data structure to deal with.
 
-It's also worth noting that linear search and linked lists are analogs in the same way binary search and binary trees are analogs.  
+The first tree based data structure we'll deal with is called the binary search tree.  It's worth noting that linear search and linked lists are analogs in the same way binary search and binary search trees are analogs.  
+
+So how does a tree look different than a linked list?
+
+The simplest way to see this is by looking at the `Node` class:
+
+```
+class Node:
+    def __init__(self,data,left=None,right=None,parent=None):
+        self.left = left
+        self.right = right
+        self.data = data
+        self.parent = parent
+    def __lt__(self,other):
+        return self.data < other
+    def __gt__(self,other):
+        return self.data > other
+    def __le__(self,other):
+        return self.data <= other
+    def __ge__(self,other):
+        return self.data >= other
+    def __eq__(self,other):
+        return self.data == other
+    def __ne__(self,other):
+        return self.data != other
+    def __str__(self):
+        return repr(self.data)
+```
+
+Notice that we define a left and a right, instead of a next node.  That's because in a tree data structure our data can go at least two places next.  Eventually we'll move onto more complex trees with three possible places for data to go, and so on.  So how does this effect insert, delete or print?  
+
+Instead of doing things linearly, we'll make use of recursions to search our list.  That's because we have two possible directions that we can move.  Therefore it just makes sense to do things recursively.  Otherwise you lose the concept of a current node and have to keep track of increasingly more pointers.  By scoping your code and then allowing recursive function calls to handle the state of your "current" reference, the code you need to write is minimal.  But additionally, by making use of recursion, you have an obvious way of moving around your tree.
+
+Let's start by looking at our implementation in full:
+
+```
+class Node:
+    def __init__(self,data,left=None,right=None,parent=None):
+        self.left = left
+        self.right = right
+        self.data = data
+        self.parent = parent
+    def __lt__(self,other):
+        return self.data < other
+    def __gt__(self,other):
+        return self.data > other
+    def __le__(self,other):
+        return self.data <= other
+    def __ge__(self,other):
+        return self.data >= other
+    def __eq__(self,other):
+        return self.data == other
+    def __ne__(self,other):
+        return self.data != other
+    def __str__(self):
+        return repr(self.data)
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+        self.size = 0
+        
+    def insert(self,data):
+        if not self.root:self.root = Node(data)
+        else:self._insert(data,self.root)
+        self.size += 1
+    def _insert(self,data,cur):
+        if data < cur:
+            if not cur.left:
+                new_node = Node(data)
+                cur.left = new_node
+                new_node.parent = cur
+            else: self._insert(data,cur.left)
+        else:
+            if not cur.right:
+                new_node = Node(data)
+                cur.right = new_node
+                new_node.parent = cur
+            else: self._insert(data,cur.right)
+            
+    def pprint(self):
+        if not self.root: return
+        self._pprint(self.root,0)
+    def _pprint(self,cur,level):
+        print level*"*"+str(cur)
+        if cur.left:self._pprint(cur.left,level+1)
+        if cur.right:self._pprint(cur.right,level+1)
+
+    def exists(self,data):
+        cur = self.root
+        return self._exists(data,cur)
+    def _exists(self,data,cur):
+        if data == cur:return True
+        elif data < cur:
+            if cur.left:return self._exists(data,cur.left)
+            else: return False
+        else:
+            if cur.right: return self._exists(data,cur.right)
+            else: return False
+
+    def get(self,data):
+        cur = self.root
+        return self._get(data,cur)
+    def _get(self,data,cur):
+        if data == cur: return cur
+        elif data < cur:
+            if cur.left: return self._get(data,cur.left)
+            else: return False
+        else:
+            if cur.right: return self._get(data,cur.right)
+            else: return False
+
+    def children_count(self,cur):
+        count = 0
+        if cur.left: count += 1
+        if cur.right: count += 1
+        return count
+    
+    def delete(self,data):
+        cur = self.get(data)
+        if cur:
+            num_children = self.children_count(cur)
+            parent = cur.parent
+            if num_children == 0:
+                if parent:
+                    if parent.left is cur: parent.left = None
+                    elif parent.right is cur: parent.right = None
+                elif cur is self.root:
+                    self.root = None
+            elif num_children == 1:
+                if cur.left:
+                    new_node = cur.left
+                    new_node.parent = cur.parent
+                else:
+                    new_node = cur.right
+                    new_node.parent = cur.parent
+                if parent:
+                    if parent.left is cur:
+                        parent.left = None
+                        cur = None
+                        parent.left = new_node
+                    elif parent.right is cur:
+                        parent.right = None
+                        cur = None
+                        parent.right = new_node
+                else:
+                    self.root = None
+                    cur = None
+                    self.root = new_node
+            else:
+                parent = cur
+                successor = cur.right
+                while successor.left:
+                    parent = successor
+                    successor = successor.left
+                cur.data = successor.data
+                if parent.left == successor:
+                    parent.left = successor.right
+                else:
+                    parent.right = successor.right
+        self.size -= 1
+        
+if __name__ == '__main__':
+    bst = BinarySearchTree()
+    bst.insert(5)
+    bst.insert(7)
+    bst.insert(3)
+    bst.insert(1)
+    bst.insert(9)
+
+    bst.pprint()
+    
+    bst.delete(7)
+    bst.delete(1)
+    bst.delete(3)
+    bst.delete(9)
+    bst.delete(5)
+
+```
+
+Feel free to skip over this and use it as a reference.  Now let's look at just the `insert` method and the `__init__` method.  
+
+```
+def __init__(self):
+    self.root = None
+    self.size = 0
+    
+def insert(self,data):
+    if not self.root:self.root = Node(data)
+    else:self._insert(data,self.root)
+    self.size += 1
+def _insert(self,data,cur):
+    if data < cur:
+        if not cur.left:
+            new_node = Node(data)
+            cur.left = new_node
+            new_node.parent = cur
+        else: self._insert(data,cur.left)
+    else:
+        if not cur.right:
+            new_node = Node(data)
+            cur.right = new_node
+            new_node.parent = cur
+        else: self._insert(data,cur.right)
+```
+
+In a binary search tree, data is ordered.  This is an important distinction between linkedlists, which has no real ordering imposed.  However it's worth noting the ordering is weak - it's only a context aware ordering, where any node is only aware of the nodes around it.  Within this context, nodes are ordered.  Any lower node to the left of the current node, will be less than the current node.  Any node greater than the current node will be to the right of it.  This is true for any node one level down.  Past that, anything is possible.  
+
+So what does this construction achieve?  It organizes the data into a set of midpoints, like we made use of in the binary search algorithm.  Everything is already set as a midpoint, making binary search the obvious thing to do.  As we've seen already, when done correctly, the speed up in access time makes it worth while to do this.  
+
+So let's break into the insert method:
+
+```
+def insert(self,data):
+    if not self.root:self.root = Node(data)
+    else:self._insert(data,self.root)
+    self.size += 1
+```
+
+As you can see, the first we set is the self.root (assuming it doesn't exist).  This self.root comes from the `__init__` method above. So if self.root isn't set we simply set it and we are done.  Otherwise, we call an internal `self._insert` method.  It is convention in python to use a single `_` infront of a method to denote it as internal to the class.  If there is a single `_` this is the same thing as saying "you probably shouldn't call this method from the class.  However if there is a second `__` like in `__init__` that means you should never call this method explicitly unless you absolutely know what you are doing.  This is all just convention, and when you are hacking away on your own projects feel free to experiment!  However, in an industry setting, probably best to not play around with `__` methods.  
+
+So what does `_insert` do?  This is where the recursion takes place.  And almost all of the logic for the insert method.
+
+```
+def _insert(self,data,cur):
+    if data < cur:
+        if not cur.left:
+            new_node = Node(data)
+            cur.left = new_node
+            new_node.parent = cur
+        else: self._insert(data,cur.left)
+    else:
+        if not cur.right:
+            new_node = Node(data)
+            cur.right = new_node
+            new_node.parent = cur
+        else: self._insert(data,cur.right)
+```
+
+Here we check if the data is less than the current node - `cur`.  We can do direct comparisons because of the comparator methods we defined in the `Node` class:
+
+```
+def __lt__(self,other):
+    return self.data < other
+def __gt__(self,other):
+    return self.data > other
+def __le__(self,other):
+    return self.data <= other
+def __ge__(self,other):
+    return self.data >= other
+def __eq__(self,other):
+    return self.data == other
+def __ne__(self,other):
+    return self.data != other
+```
+
+Each one stands for a different operator.  So for instance __lt__ stands for less than, which is clear by the return statement in the method definition: `self.data < other`.  
+
+So what happens if data is less than cur?
+
+```
+if not cur.left:
+    new_node = Node(data)
+    cur.left = new_node
+    new_node.parent = cur
+else: self._insert(data,cur.left)
+```
+
+First we run a check to see if `cur.left` exists - if it doesn't than we create a new node there and then link the new node to the current node - `cur.left = new_node`.  But we also link the new node back to the current - `new_node.parent = cur`.  It's going to be extremely helpful to have access to the parent of the current node when we write our delete method.  
+
+So assuming that our data is less than our current reference node - `cur` and there is already a `cur.left`, what do we do?  Well we need to find someplace further down in the tree to store the current data, so we simply call the function again with data and the current node's left child - `self._insert(data,cur.left)`.  What this does is essentially carry out the above logic again (assuming data is less than cur.left).  And carries this out until we finally get to an exit condition.  Since our recursion doesn't return anything, once we leave a function call context, the function ends.  This means the recursion will be fast.  How fast you might add?  O( log n ) fast.  By explicitly storing everything in a binary fashion we save a ton of time searching for where to store information.  And there isn't even more work than linear search insert.  Because of the branching caused by the if/else statements, we are guaranteed the same amount of work as linear insert.
+
+Next let's look at our pprint method, which is sort for pretty print.  
+
+```
+def pprint(self):
+    if not self.root: return
+    self._pprint(self.root,0)
+def _pprint(self,cur,level):
+    if cur.left:self._pprint(cur.left,level+1)
+    print level*" "+str(cur)
+    if cur.right:self._pprint(cur.right,level+1)
+```
+
+Our `pprint` method excepts no parameters - because all the state is already stored in the tree.  And simply goes through and prints everything out.  Inside our pprint method we simply check to make sure we have a root node.  Assuming we do, we pass self.root and 0 to `self._pprint`.  
+
+The 0 we passed in is the current level - in this case 0.  Assuming there is a next left, we traverse there first, then print out the current node with the number of spaces being determined by how deep in the tree it is.  And then we traverse right.  This is called infix notation and refers to the placement of the print statement - between the branching statements of the recursion.  If we wanted to print the elements highest up on the tree first we'd use prefix notation:
+
+```
+def _pprint(self,cur,level):
+    print level*" "+str(cur)
+    if cur.left:self._pprint(cur.left,level+1)
+    if cur.right:self._pprint(cur.right,level+1)
+```
+
+And if we wanted the highest elements in the tree to be printed last, we'd use postfix notation:
+
+```
+def _pprint(self,cur,level):
+    if cur.left:self._pprint(cur.left,level+1)
+    if cur.right:self._pprint(cur.right,level+1)
+    print level*" "+str(cur)    
+```
+
+You should try swapping out for these other two methods and see what happens to your tree when you call pprint!  As a reference you can consider the following link for understanding more about [infix, postfix, and prefix](http://www.cs.man.ac.uk/~pjj/cs212/fix.html).
+
+Now we've come to the hardest method to implement: delete.
+
+```
+def get(self,data):
+    cur = self.root
+    return self._get(data,cur)
+def _get(self,data,cur):
+    if data == cur: return cur
+    elif data < cur:
+        if cur.left: return self._get(data,cur.left)
+        else: return False
+    else:
+        if cur.right: return self._get(data,cur.right)
+        else: return False
+
+def children_count(self,cur):
+    count = 0
+    if cur.left: count += 1
+    if cur.right: count += 1
+    return count
+
+def delete(self,data):
+    cur = self.get(data)
+    if cur:
+        num_children = self.children_count(cur)
+        parent = cur.parent
+        if num_children == 0:
+            if parent:
+                if parent.left is cur: parent.left = None
+                elif parent.right is cur: parent.right = None
+            elif cur is self.root:
+                self.root = None
+        elif num_children == 1:
+            if cur.left:
+                new_node = cur.left
+                new_node.parent = cur.parent
+            else:
+                new_node = cur.right
+                new_node.parent = cur.parent
+            if parent:
+                if parent.left is cur:
+                    parent.left = None
+                    cur = None
+                    parent.left = new_node
+                elif parent.right is cur:
+                    parent.right = None
+                    cur = None
+                    parent.right = new_node
+            else:
+                self.root = None
+                cur = None
+                self.root = new_node
+        else:
+            parent = cur
+            successor = cur.right
+            while successor.left:
+                parent = successor
+                successor = successor.left
+            cur.data = successor.data
+            if parent.left == successor:
+                parent.left = successor.right
+            else:
+                parent.right = successor.right
+    self.size -= 1
+```
 

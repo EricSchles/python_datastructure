@@ -46,8 +46,8 @@ class BinarySearchTree:
         if not self.root: return
         self._pprint(self.root,0)
     def _pprint(self,cur,level):
-        print level*"*"+str(cur)
         if cur.left:self._pprint(cur.left,level+1)
+        print level*" "+str(cur)
         if cur.right:self._pprint(cur.right,level+1)
 
     def exists(self,data):
