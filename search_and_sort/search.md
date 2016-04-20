@@ -1326,6 +1326,61 @@ if cur:
 
 This is by far the simplest - We simply check to see if the parent of the current node exists - the node to be deleted.  If it does then we simply set it equal to None - we do this via: `if parent.left is cur: parent.left = None`.  The is operator does exactly what you think - it checks to see if something is the same as something else.  This is referred to as reference comparison.  Since you can have two references to the same thing - assuming you do, in this case, then you delete.  Notice that we check which node of the parent we are deleting - so we must check both the left and the right nodes.
 
+Assuming that there is no parent node, or rather than `cur.parent == None`, this implies we must at the root of our tree and therefore we simply set self.root = None, deleting the only node in the tree.
 
+Now let's look at the case where we have one child node:
 
+```
+elif num_children == 1:
+    if cur.left:
+        new_node = cur.left
+        new_node.parent = cur.parent
+    else:
+        new_node = cur.right
+        new_node.parent = cur.parent
+    if parent:
+        if parent.left is cur:
+            parent.left = None
+            cur = None
+            parent.left = new_node
+        elif parent.right is cur:
+            parent.right = None
+            cur = None
+            parent.right = new_node
+    else:
+        self.root = None
+        cur = None
+        self.root = new_node
+```
+
+In this case, we check to see which node will be the new one:
+
+```
+if cur.left:
+    new_node = cur.left
+    new_node.parent = cur.parent
+else:
+    new_node = cur.right
+    new_node.parent = cur.parent    
+```
+
+This is done this way, because we don't necessarily know this already, only that a left or right node exists.  Once we have our new_node we simply set the new node equal to the current nodes position in the tree and then delete the reference to the current node.   
+
+```
+if parent:
+    if parent.left is cur:
+        parent.left = None
+        cur = None
+        parent.left = new_node
+    elif parent.right is cur:
+        parent.right = None
+        cur = None
+        parent.right = new_node
+else:
+    self.root = None
+    cur = None
+    self.root = new_node
+```
+
+Note there is another case here - what happens when there is only the root node?  This case is far easier, we simply delete the root node and set it equal to the new_node.
 
