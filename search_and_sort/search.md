@@ -1307,6 +1307,25 @@ def children_count(self,cur):
     return count
 ```
 
-This method simply inspects where we are in the tree - if `children_count` returns 0 we can safely say we are at the bottom of our tree and can simply delete the node with our data.  If `children_count` returns 1, this is still not too bad a situation 
+This method simply inspects where we are in the tree - if `children_count` returns 0 we can safely say we are at the bottom of our tree and can simply delete the node with our data.  If `children_count` returns 1, this is still not too bad a situation, we simply need to move the child of the node to be deleted into the node to be deleted's place in the tree.  However, in the situation when we have two children it's unclear which node (if either) of these nodes belongs in the node to be deleted's place.  So we need to traverse the tree looking for the appropriate node, this will be the hardest case for us to implement.
+
+Let's go through the cases one at a time explicitly:
+
+```
+cur = self.get(data)
+if cur:
+    num_children = self.children_count(cur)
+    parent = cur.parent
+    if num_children == 0:
+        if parent:
+            if parent.left is cur: parent.left = None
+            elif parent.right is cur: parent.right = None
+        elif cur is self.root:
+            self.root = None
+```
+
+This is by far the simplest - We simply check to see if the parent of the current node exists - the node to be deleted.  If it does then we simply set it equal to None - we do this via: `if parent.left is cur: parent.left = None`.  The is operator does exactly what you think - it checks to see if something is the same as something else.  This is referred to as reference comparison.  Since you can have two references to the same thing - assuming you do, in this case, then you delete.  Notice that we check which node of the parent we are deleting - so we must check both the left and the right nodes.
+
+
 
 
