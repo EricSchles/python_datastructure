@@ -1279,3 +1279,34 @@ def delete(self,data):
     self.size -= 1
 ```
 
+In order to implement delete, we are going to make use of a get method - which traverses our tree looking for the node we want to delete:
+
+```
+def get(self,data):
+    cur = self.root
+    return self._get(data,cur)
+def _get(self,data,cur):
+    if data == cur: return cur
+    elif data < cur:
+        if cur.left: return self._get(data,cur.left)
+        else: return False
+    else:
+        if cur.right: return self._get(data,cur.right)
+        else: return False
+```
+
+This saves us a ton of lines of code, and saves us from having to search for the node we want to delete, in the delete method.  The get method pretty closesly follows the same structure as insert, except we have to actually return something, so there is a return statement in each function call to the internal `_get` method.  Other than that we aren't doing anything new here.
+
+The next thing to cover is the other "helper" method for this code:
+
+```
+def children_count(self,cur):
+    count = 0
+    if cur.left: count += 1
+    if cur.right: count += 1
+    return count
+```
+
+This method simply inspects where we are in the tree - if `children_count` returns 0 we can safely say we are at the bottom of our tree and can simply delete the node with our data.  If `children_count` returns 1, this is still not too bad a situation 
+
+
