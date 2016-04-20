@@ -26,7 +26,8 @@ class BinarySearchTree:
         
     def insert(self,data):
         if not self.root:self.root = Node(data)
-        else:self._insert(data,self.root)     
+        else:self._insert(data,self.root)
+        self.size += 1
     def _insert(self,data,cur):
         if data < cur:
             if not cur.left:
@@ -63,7 +64,7 @@ class BinarySearchTree:
 
     def get(self,data):
         cur = self.root
-        return self._exists(data,cur)
+        return self._get(data,cur)
     def _get(self,data,cur):
         if data == cur: return cur
         elif data < cur:
@@ -72,6 +73,7 @@ class BinarySearchTree:
         else:
             if cur.right: return self._get(data,cur.right)
             else: return False
+
     def children_count(self,cur):
         count = 0
         if cur.left: count += 1
@@ -80,14 +82,47 @@ class BinarySearchTree:
     
     def delete(self,data):
         cur = self.get(data)
-        num_children = children_count(cur)
-        parent = cur.parent
         if cur:
-            if parent:
-                if parent.left is cur: parent.left = None
-                else: parent.right = None
-            else: 
-            
+            num_children = self.children_count(cur)
+            parent = cur.parent
+            if num_children == 0:
+                if parent:
+                    if parent.left is cur: parent.left = None
+                    elif parent.right is cur: parent.right = None
+                elif cur is self.root:
+                    self.root = None
+            elif num_children == 1:
+                if cur.left:
+                    new_node = cur.left
+                    new_node.parent = cur.parent
+                else:
+                    new_node = cur.right
+                    new_node.parent = cur.parent
+                if parent:
+                    if parent.left is cur:
+                        parent.left = None
+                        cur = None
+                        parent.left = new_node
+                    elif parent.right is cur:
+                        parent.right = None
+                        cur = None
+                        parent.right = new_node
+                else:
+                    self.root = None
+                    cur = None
+                    self.root = new_node
+            else:
+                parent = cur
+                successor = cur.right
+                while successor.left:
+                    parent = successor
+                    successor = successor.left
+                cur.data = successor.data
+                if parent.left == successor:
+                    parent.left = successor.right
+                else:
+                    parent.right = successor.right
+        self.size -= 1
         
 if __name__ == '__main__':
     bst = BinarySearchTree()
@@ -96,5 +131,14 @@ if __name__ == '__main__':
     bst.insert(3)
     bst.insert(1)
     bst.insert(9)
-    print bst.exists(9)
-    #bst.pprint()
+
+    bst.pprint()
+    
+    bst.delete(7)
+    bst.delete(1)
+    bst.delete(3)
+    bst.delete(9)
+    bst.delete(5)
+
+    
+    bst.pprint()

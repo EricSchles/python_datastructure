@@ -8,7 +8,7 @@ def recursive_binary_search(elem,array,first,last):
     if elem == array[midpoint]:
         return midpoint
     else:
-        if elem < array[midpoint]:
+        if elem <= array[midpoint]:
             return recursive_binary_search(elem,array,first,midpoint-1)
         else:
             return recursive_binary_search(elem,array,midpoint+1,last)
@@ -20,7 +20,7 @@ def dyn_binary_search(elem,array):
         midpoint = (firsts[-1] + lasts[-1]) // 2
         if elem == array[midpoint]:
             return midpoint
-        elif elem < array[midpoint]:
+        elif elem <+ array[midpoint]:
             lasts.append(midpoint-1)
         else:
             firsts.append(midpoint+1)
