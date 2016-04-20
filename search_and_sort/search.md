@@ -1384,3 +1384,21 @@ else:
 
 Note there is another case here - what happens when there is only the root node?  This case is far easier, we simply delete the root node and set it equal to the new_node.
 
+Now we are ready to deal with the hardest case - two children nodes:
+
+```
+parent = cur
+successor = cur.right
+while successor.left:
+    parent = successor
+    successor = successor.left
+cur.data = successor.data
+if parent.left == successor:
+    parent.left = successor.right
+else:
+    parent.right = successor.right
+```
+
+Here we first set the cur node equal to the "parent" - this is the node that will be overwritten with the successor information.  Here we are actually making use of some word place - as the parent is replaced by the child or successor.  Much like the successor to a thrown.  Why do we set the successor equal to cur.right?  Because we are guaranteed it exists (and we could have just as easily used cur.left and flipped everything else).  If you want some practice with this, try implementing this algorithm with cur.left and make appropriate changes throughout.  You'll find this produces more or less the same effect.  The point I'm driving at here is - it doesn't matter whether we set the successor to cur.right or cur.left, but it will effect the rest of our traversal.
+
+Next we, while successor.left exists, we update our parent to the current successor and set successor = successor.left.  This is because we are searching for the smallest node to the right of the current node.  
