@@ -1401,4 +1401,8 @@ else:
 
 Here we first set the cur node equal to the "parent" - this is the node that will be overwritten with the successor information.  Here we are actually making use of some word place - as the parent is replaced by the child or successor.  Much like the successor to a thrown.  Why do we set the successor equal to cur.right?  Because we are guaranteed it exists (and we could have just as easily used cur.left and flipped everything else).  If you want some practice with this, try implementing this algorithm with cur.left and make appropriate changes throughout.  You'll find this produces more or less the same effect.  The point I'm driving at here is - it doesn't matter whether we set the successor to cur.right or cur.left, but it will effect the rest of our traversal.
 
-Next we, while successor.left exists, we update our parent to the current successor and set successor = successor.left.  This is because we are searching for the smallest node to the right of the current node.  
+Next we, while successor.left exists, we update our parent to the current successor and set successor = successor.left.  This is because we are searching for the smallest node to the right of the current node.  Aka the one that will be closest to it in the ordering of the tree.  Then we simply set the current node's data equal to the successor and then update all the references.  So why do we check for `parent.left == successor`?  Well, the parent is the node before the successor - therefore if the successor is a left node - then parent.left will now equal the right node of the successor, because it's been moved up further in the tree.  Otherwise we have are in the case where the parent has no further left nodes and therefore we set `parent.right = successor.right`.  
+
+Fortunately this is now the end of our binary search tree!!  Not too bad, right `;)`
+
+Now that we have some context for working with "non-linear" data structures, let's consider others.  
