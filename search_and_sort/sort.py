@@ -7,7 +7,8 @@ def bubble_sort(alist):
             if alist[i]>alist[i+1]:
                 alist[i],alist[i+1] = alist[i+1],alist[i]
     return alist
-                
+
+
 def selection_sort(alist):
     for fillslot in range(len(alist))[::-1]:
         positionOfMax=alist.index(max(alist[:fillslot+1]))
@@ -16,8 +17,6 @@ def selection_sort(alist):
 
 
 def merge_sort(alist):
-    lefts = []
-    rights = []
     if len(alist) <= 1:
         return alist
     mid = len(alist) // 2
@@ -69,10 +68,11 @@ def quick_sort(alist):
         return quick_sort(less)+equal+quick_sort(greater)
     else:
         return alist
-    
-start = time.time()
+
+
 alist = [random.randint(0,100000) for _ in xrange(2000)]
-bubble_sort(alist[:])
+start = time.time()
+bubble_list = bubble_sort(alist[:])
 print "bubble sort took",time.time() - start
 start = time.time()
 selection_sort(alist[:])
