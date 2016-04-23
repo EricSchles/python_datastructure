@@ -1,0 +1,10 @@
+class Node:
+    def __init__(self,data,connections=None):
+        self.data = data
+        self.connections = connections
+    def __str__(self):
+        return repr(self.data)
+    
+class Graph:
+    def __init__(self):
+        

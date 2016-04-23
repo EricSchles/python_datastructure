@@ -20,7 +20,7 @@ def dyn_binary_search(elem,array):
         midpoint = (firsts[-1] + lasts[-1]) // 2
         if elem == array[midpoint]:
             return midpoint
-        elif elem <+ array[midpoint]:
+        elif elem <= array[midpoint]:
             lasts.append(midpoint-1)
         else:
             firsts.append(midpoint+1)

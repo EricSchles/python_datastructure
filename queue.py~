@@ -1,0 +1,7 @@
+class Queue:
+    def __init__(self):
+        self.listing = []
+    def get(self):
+        self.listing.
+    def put(self,data):
+        self.listing.insert(0,data)

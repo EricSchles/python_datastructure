@@ -112,4 +112,59 @@ And here,
 
 `right = merge_sort(alist[mid:])`
 
-Together we get to 
+These two operations taken together we get to a binary tree!  Where `left`, is like the left reference in a binary tree node!  And `right` is like the right reference in a binary tree node.  Pretty nifty right?!
+
+Once we have everything all split up we have to merge it back!  To do that we run iteratively through the two lists, joining together everything and making sure we do that in an ordered fashion.
+
+So more or less what we are doing is comparing two lists - left and right and as long as the next element in left is less than the next element in right, append that one.  Otherwise we append the right element until we get to the next left element that is less than the right element.  After that we just append all the left array elements and then all the right array elements (because right should be more than left).  
+
+Let's look at the code again for merge:
+
+```
+def merge(left,right):
+	merged = []
+	left_ref, right_ref = 0,0
+	while left_ref < len(left) and right_ref < len(right):
+		if left[left_ref] < right[right_ref]:
+			merged.append(left[left_ref])
+			left_ref +=1
+		else:
+			merged.append(right[right_ref
+	while left_ref < len(left):
+		merged.append(left[left_ref])
+	while right_ref < len(right):
+		merged.append(right[right_ref])
+	return merged
+```
+
+
+After we do that we return the merged list up the recursive tree.  Then the recursion implicitly joins together the merged individual lists, forming one sorted list.  Notice that we impose an ordering to the elements of our split up arrays at every level, continually insuring that our final list will be ordered.  All and all this ads up over the breath and depth of the recursion.
+
+So the recursive step gives ups `O(log n)` operations and the merge step gives us `O(n)` more operations.  Since we do `O(n)` operations inside of the recursive step we have to think of this as function composition and therefore our run times are multiplied.  So we end up with `O(n log n)` as our run time.  Which turns out to hold no matter how ordered or unordered our list.  You might think to yourself, boo!  But in fact `O(n log n)` is definitely an improvement over our previous algorithms - averaging `O(n^2)`.  And in the land of benchmarks this turns out to be a decent improvement. 
+
+Now let's talk about quick sort - our first semi advanced algorithm.  Quick sort has a lot of different ways it can be implemented.  And some of them have lots and lots of pointer chasing.  Fortunately our version is very readible, in part due to the power of python's high level dynamic nature.  So without further ado, quick sort, written the right way:
+
+```
+def quick_sort(alist):
+	less = []
+	equal = []
+	greater = []
+	if len(alist) > 1:
+		pivot = alist[0]
+		for x in alist:
+			if x < pivot:
+				less.append(x)
+			elif x == pivot:
+				equal.append(x)
+			elif x > pivot:
+				greater.append(x)
+		return quick_sort(less)+equal+quick_sort(greater)
+	else:
+		return alist
+```
+
+The divide and conquer part of this algorithm occurs in the return statement.  Notice that we do divide and conquer here as well as in merge sort.  This algorithm works in a very simple way - the first element in the list is used as the pivot, anything less than this element is moved into a less array, anything equal is moved into an equal array, and anything greater is moved into a greater array.  Then the lists are concatenated.  During concatenation the ordering is applied.  Notice that we call quick_sort on less and that we have by design guaranteed that elements smaller than the current element will be in the less subarray.  The same holds true for greater.  Therefore all and all we end up with a loosely ordered set of lists that are recursively divided.  And then when each ordered singleton array is created, they are all joined.  
+
+So how long does this take to run?  The answer is average `O(n log(n))`.  That's mostly because of the divide and conquer nature of the algorithm.  However quick sort has a worst case running time of `O(n^2)`.  
+
+

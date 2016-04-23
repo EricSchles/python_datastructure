@@ -1,0 +1,7 @@
+from graph import Graph
+
+def build_graph(word_file):
+    d = {}
+    g = Graph()
+    with open(word_file,"r") as f:
+        words = f.read().split("\n")
