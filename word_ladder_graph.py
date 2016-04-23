@@ -34,8 +34,11 @@ def bfs(g,start):
                 neighbor.predecessor = current_vertex
                 vertex_queue.put(neighbor)
         current_vertex.color = "black"
+    return g
+
+
     
 if __name__ == '__main__':
-    g = build_graph("words.txt")
+    g = build_graph("test_words.txt")
     start = g.vertex_list[0]
     bfs(g,start)
