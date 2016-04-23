@@ -1,4 +1,5 @@
 from graph import Graph
+from queue import Queue
 
 def build_graph(word_file):
     d = {}
@@ -23,6 +24,14 @@ def bfs(g,start):
     start.distance = 0
     start.predecessor = None
     vertex_queue = Queue()
-
+    vertex_queue.put(start)
+    while vertex_queue.size() > 0:
+        current_vertex = vertex_queue.get()
+        for neighbor in current_vertex.connected_to.keys():
+            if neighbor.color == "white":
+                neighbor.color = "gray"
+                neighbor.distance = current_vertex.distance + 1
+                neighbor.predecessor = current_vertex
+    
 if __name__ == '__main__':
     g = build_graph("words.txt")

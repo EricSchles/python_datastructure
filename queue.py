@@ -5,7 +5,9 @@ class Queue:
         return self.listing.pop()
     def put(self,data):
         self.listing.insert(0,data)
-
+    def size(self):
+        return len(self.listing)
+        
 class Node:
     def __init__(self,data,next=None,prev=None):
         self.data = data
