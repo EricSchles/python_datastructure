@@ -32,6 +32,10 @@ def bfs(g,start):
                 neighbor.color = "gray"
                 neighbor.distance = current_vertex.distance + 1
                 neighbor.predecessor = current_vertex
+                vertex_queue.put(neighbor)
+        current_vertex.color = "black"
     
 if __name__ == '__main__':
     g = build_graph("words.txt")
+    start = g.vertex_list[0]
+    bfs(g,start)
