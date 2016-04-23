@@ -37,13 +37,13 @@ class Graph:
         return new_vertex
 
     def get_vertex(self,n):
-        if search(n,self.vertex_list.keys()):
+        if exists(n,self.vertex_list.keys()):
             return self.vertex_list[n]
         else:
             return None
 
     def __contains__(self,n):
-        return search(n,self.vertex_list.keys())
+        return exists(n,self.vertex_list.keys())
 
     def add_edge(self,from_edge,to_edge,cost=0):
         if not exists(from_edge,self.vertex_list.keys()):

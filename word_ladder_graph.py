@@ -36,9 +36,18 @@ def bfs(g,start):
         current_vertex.color = "black"
     return g
 
-
+def traverse(y):
+    x = y
+    while x.predecessor:
+        print x.id
+        x = x.predecessor
+    print x.id
     
 if __name__ == '__main__':
     g = build_graph("test_words.txt")
-    start = g.vertex_list[0]
-    bfs(g,start)
+    for v in g.vertex_list.keys():
+        for w in v:
+            print "{} {}".format(v.id,w.id)
+    #start = g.get_vertex("fool")
+    #g = bfs(g,start)
+    #traverse(g)
