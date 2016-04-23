@@ -46,7 +46,8 @@ def traverse(y):
 if __name__ == '__main__':
     g = build_graph("test_words.txt")
     for v in g.vertex_list.keys():
-            print "{}".format(v)
+        for w in v.keys():
+            print "{} {}".format(v,w)
     #start = g.get_vertex("fool")
     #g = bfs(g,start)
     #traverse(g)
